@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>عبدالرحمن البدري جيم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 12px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,215,0,0.4);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #facc1522;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+        .logo-area i {
+            font-size: 1.5rem;
+            color: #facc15;
+        }
+        .logo-area span {
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #facc15, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 15px;
+            background: #1e293b;
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .trophy-icon { color: #fbbf24; }
+        .rank-icon { color: #a855f7; }
+        .username-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+        .username-area input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            outline: none;
+            width: 100px;
+        }
+        .peer-id-box {
+            background: #2d3a4e;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #111827aa;
+            padding: 6px 12px;
+            border-radius: 50px;
+            justify-content: center;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        .tab-btn.active {
+            background: #facc15;
+            color: #0f172a;
+        }
+        .panel {
+            display: none;
+            background: rgba(15,23,42,0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 28px;
+            padding: 16px;
+            border: 1px solid rgba(250,204,21,0.2);
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        .panel.active-panel {
+            display: block;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        canvas {
+            background: #1a2a32;
+            border-radius: 28px;
+            box-shadow: 0 0 0 3px #facc1555, 0 10px 25px black;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1000 / 600;
+            touch-action: none;
+        }
+        .touch-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 5px 0;
+            gap: 15px;
+            padding: 0 10px;
+        }
+        .joystick-area {
+            width: 130px;
+            height: 130px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 65px;
+            position: relative;
+            touch-action: none;
+            border: 2px solid #facc15;
+        }
+        .joystick-thumb {
+            width: 55px;
+            height: 55px;
+            background: #facc15;
+            border-radius: 30px;
+            position: absolute;
+            top: 37.5px;
+            left: 37.5px;
+            transition: transform 0.02s;
+            pointer-events: none;
+        }
+        .fire-btn {
+            width: 90px;
+            height: 90px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 0 3px #facc15;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.05s;
+        }
+        .fire-btn:active {
+            transform: scale(0.92);
+            background: #dc2626;
+        }
+        .game-sidebar {
+            background: #0f172a;
+            border-radius: 28px;
+            padding: 15px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .game-status {
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .game-btn {
+            background: #facc15;
+            border: none;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 8px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .char-grid, .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .char-card, .shop-card {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 10px;
+            text-align: center;
+        }
+        .char-card.selected {
+            border: 2px solid #facc15;
+            background: #2d3a4e;
+        }
+        .friend-list, .chat-messages {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .friend-item {
+            background: #1e293b;
+            margin: 6px 0;
+            padding: 8px 12px;
+            border-radius: 40px;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+            border: none;
+            background: #1e293b;
+            color: white;
+        }
+        button {
+            background: #facc15;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: bold;
+        }
+        .leaderboard-list {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 10px;
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #334155;
+        }
+        .warning-note {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 10px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .top-bar { padding: 6px 12px; }
+            .stat { font-size: 0.75rem; gap: 3px; }
+            .username-area input { width: 80px; }
+            .logo-area span { display: none; }
+            .logo-area i { font-size: 1.2rem; }
+            .panel { max-height: 65vh; }
+            .joystick-area { width: 110px; height: 110px; }
+            .joystick-thumb { width: 45px; height: 45px; top: 32.5px; left: 32.5px; }
+            .fire-btn { width: 75px; height: 75px; font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="top-bar">
+        <div class="logo-area">
+            <i class="fas fa-gamepad"></i>
+            <span>عبدالرحمن البدري جيم</span>
+        </div>
+        <div class="profile-stats">
+            <div class="stat"><i class="fas fa-trophy trophy-icon"></i> <span id="cupsValue">0</span></div>
+            <div class="stat"><i class="fas fa-star rank-icon"></i> <span id="rankValue">1</span>/100</div>
+        </div>
+        <div class="username-area">
+            <i class="fas fa-user-astronaut"></i>
+            <input type="text" id="usernameInput" maxlength="14">
+            <button id="saveUsernameBtn">✓</button>
+        </div>
+        <div class="peer-id-box">
+            <i class="fas fa-id-card"></i> <span id="myPeerId">...</span>
+            <button id="copyPeerBtn" style="background:#3b4252; padding:2px 6px;"><i class="fas fa-copy"></i></button>
+        </div>
+    </div>
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="play">⚔️ اللعب</button>
+        <button class="tab-btn" data-tab="shop">🛒 متجر (20)</button>
+        <button class="tab-btn" data-tab="friends">👥 أصدقاء & دردشة</button>
+        <button class="tab-btn" data-tab="leaderboard">🏆 الترتيب العالمي</button>
+        <button class="tab-btn" data-tab="characters">⭐ شخصياتي</button>
+    </div>
+
+    <!-- لوحة اللعب -->
+    <div id="playPanel" class="panel active-panel">
+        <h2 style="font-size:1.3rem;"><i class="fas fa-gamepad"></i> ساحة المعركة</h2>
+        <div class="game-container">
+            <canvas id="gameCanvas" width="1000" height="600"></canvas>
+
+            <div class="touch-controls">
+                <div id="joystickZone" class="joystick-area">
+                    <div id="joystickThumb" class="joystick-thumb"></div>
+                </div>
+                <div id="fireTouchBtn" class="fire-btn"><i class="fas fa-crosshairs"></i></div>
+            </div>
+
+            <div class="game-sidebar">
+                <div class="game-status">
+                    <div>🏆 <span id="gameScore">0</span> قتلات</div>
+                    <div>❤️ صحة: <span id="gameHealth">100</span></div>
+                    <div>⏱️ <span id="gameTimer">90</span> ث</div>
+                    <div>⚔️ <span id="activeBrawlerName">-</span></div>
+                </div>
+                <div style="background:#1e293b; border-radius: 20px; padding: 8px; margin-bottom: 10px; text-align: center;">
+                    <i class="fas fa-user-ninja"></i> الشخصية المجهزة: <strong id="equippedBrawlerName">-</strong> 
+                    (⚔️ <span id="equippedAttack">-</span> | ❤️ <span id="equippedHealth">-</span>)
+                </div>
+                <button id="startSoloBtn" class="game-btn"><i class="fas fa-skull"></i> بدء مواجهة الزومبي</button>
+                <button id="challengeOnlineBtn" class="game-btn" style="background:#4f46e5;"><i class="fas fa-wifi"></i> تحدى صديق أونلاين</button>
+                <select id="onlineFriendSelect" style="width:100%; padding:8px; border-radius:30px; background:#1e293b; color:white; margin-top:8px;"></select>
+                <div id="onlineGameStatus" class="warning-note"></div>
+                <div class="warning-note"><i class="fas fa-mobile-alt"></i> تحكم: اسحب على العصا اليسرى للحركة، اضغط زر النار لإطلاق الرصاص (تتجه نحو أقرب عدو).</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- باقي اللوحات -->
+    <div id="shopPanel" class="panel"><h2>🛒 متجر الشخصيات</h2><div id="shopGrid" class="shop-grid"></div></div>
+    <div id="friendsPanel" class="panel">
+        <h2>👥 الأصدقاء والدردشة</h2>
+        <div style="background:#0f172a; padding:12px; border-radius:24px;">
+            <p>معرفك: <span id="peerIdDisplay">...</span></p>
+            <div style="display:flex; gap:8px; margin:12px 0;">
+                <input type="text" id="friendPeerInput" placeholder="معرف الصديق" style="flex:1; padding:8px; border-radius:40px; background:#1e293b; border:none; color:white;">
+                <button id="addFriendBtn"><i class="fas fa-user-plus"></i> إضافة</button>
+            </div>
+            <h3>قائمة الأصدقاء</h3>
+            <div id="friendsListContainer" class="friend-list"></div>
+        </div>
+        <div class="chat-area">
+            <h3>💬 دردشة</h3>
+            <select id="chatFriendSelect" style="background:#1e293b; padding:8px; border-radius:30px; width:100%"></select>
+            <div id="chatMessagesBox" class="chat-messages" style="height:180px;"></div>
+            <div class="chat-input">
+                <input type="text" id="chatMessageInput" placeholder="رسالة...">
+                <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    <div id="leaderboardPanel" class="panel"><h2>🏆 أفضل اللاعبين عالمياً</h2><div id="worldLeaderboardList" class="leaderboard-list"></div><button id="refreshLeaderboardBtn" style="margin-top:12px;">تحديث</button></div>
+    <div id="charactersPanel" class="panel"><h2>⭐ شخصياتي</h2><div id="myCharsGrid" class="char-grid"></div></div>
+</div>
+
+<script>
+    // ---------- قاعدة بيانات الشخصيات (20) ----------
+    const CHARACTERS = [];
+    const names = ["Shelly","Nita","Colt","Bull","Jessie","Brock","Dynamike","Bo","Tick","8-Bit","Emz","Stu","Rosa","Poco","Darryl","Penny","Carl","Jacky","Grom","Bonnie"];
+    const icons = ["🐚","🐻","🔫","🐂","🤖","💣","🧨","🏹","💣","🕹️","🧴","🔥","🌹","🎸","⚓","💰","⛏️","🛞","💣","🐰"];
+    for(let i=0;i<20;i++){
+        let price = 50 + i*20;
+        let attack = 12 + Math.floor(i/2);
+        let health = 80 + i*5;
+        CHARACTERS.push({ id:i, name:names[i], icon:icons[i], price:price, attack:attack, health:health });
+    }
+    const STARTER = CHARACTERS[0];
+
+    // ---------- بيانات المستخدم ----------
+    let currentUser = {
+        username: "مقاتل",
+        cups: 300,
+        ownedChars: [0],
+        selectedCharId: 0,
+        friends: [],
+        peer: null,
+        myPeerId: null,
+        connections: new Map()
+    };
+
+    // ---------- حالة اللعبة ----------
+    let gameActive = false;
+    let gameMode = null;
+    let player = { x:500, y:300, hp:100, maxHp:100, attack:15, radius:18, kills:0 };
+    let zombies = [];
+    let projectiles = [];
+    let opponent = null;
+    let gameTimer = 90;
+    let gameInterval = null;
+    let canvas = document.getElementById("gameCanvas");
+    let ctx = canvas.getContext("2d");
+    let peerConnection = null;
+    let onlineUpdateInterval = null;
+
+    // متغيرات التحكم باللمس
+    let joystickActive = false;
+    let joystickOrigin = { x:0, y:0 };
+    let moveVec = { x:0, y:0 };
+
+    // عرض الشخصية المجهزة
+    function updateEquippedDisplay() {
+        let brawler = CHARACTERS.find(c=>c.id === currentUser.selectedCharId) || STARTER;
+        document.getElementById("equippedBrawlerName").innerText = brawler.name;
+        document.getElementById("equippedAttack").innerText = brawler.attack;
+        document.getElementById("equippedHealth").innerText = brawler.health;
+    }
+
+    // دوال أساسية
+    function updateUI() {
+        let rank = Math.min(100, Math.floor(currentUser.cups/100)+1);
+        document.getElementById("cupsValue").innerText = currentUser.cups;
+        document.getElementById("rankValue").innerText = rank;
+        updateEquippedDisplay();
+    }
+    function addCups(amount) {
+        currentUser.cups = Math.max(0, currentUser.cups + amount);
+        updateUI();
+        saveToLocal();
+        updateLeaderboard();
+    }
+    function saveToLocal() {
+        let data = {
+            username: currentUser.username, cups: currentUser.cups, ownedChars: currentUser.ownedChars,
+            selectedCharId: currentUser.selectedCharId, friends: currentUser.friends.map(f=>({peerId:f.peerId, username:f.username}))
+        };
+        localStorage.setItem("brawlData", JSON.stringify(data));
+    }
+    function loadFromLocal() {
+        let raw = localStorage.getItem("brawlData");
+        if(!raw){
+            currentUser.ownedChars = [0];
+            currentUser.cups = 300;
+            currentUser.username = "مقاتل"+Math.floor(Math.random()*100);
+            document.getElementById("usernameInput").value = currentUser.username;
+            updateUI(); return;
+        }
+        let data = JSON.parse(raw);
+        currentUser.username = data.username;
+        currentUser.cups = data.cups;
+        currentUser.ownedChars = data.ownedChars || [0];
+        currentUser.selectedCharId = data.selectedCharId || 0;
+        if(data.friends) currentUser.friends = data.friends.map(f=>({ peerId:f.peerId, username:f.username, connection:null }));
+        document.getElementById("usernameInput").value = currentUser.username;
+        updateUI();
+    }
+    function updateLeaderboard(){
+        let raw = localStorage.getItem("globalLeaderboard");
+        let board = raw ? JSON.parse(raw) : [];
+        let idx = board.findIndex(b=>b.username===currentUser.username);
+        if(idx>=0) board[idx].cups = currentUser.cups;
+        else board.push({ username:currentUser.username, cups:currentUser.cups });
+        board.sort((a,b)=>b.cups-a.cups);
+        board = board.slice(0,50);
+        localStorage.setItem("globalLeaderboard", JSON.stringify(board));
+        let container = document.getElementById("worldLeaderboardList");
+        if(container){
+            container.innerHTML = "<div class='leaderboard-entry'><span>#</span><span>اللاعب</span><span>🏆</span></div>";
+            board.forEach((e,i)=>{
+                let div = document.createElement("div");
+                div.className = "leaderboard-entry";
+                div.innerHTML = `<span>${i+1}</span><span>${e.username}</span><span>${e.cups}</span>`;
+                container.appendChild(div);
+            });
+        }
+    }
+
+    // ميكانيك اللعبة
+    function getClosestEnemy() {
+        let closest = null;
+        let minDist = Infinity;
+        if(gameMode === "online" && opponent && opponent.hp > 0) {
+            let d = Math.hypot(opponent.x - player.x, opponent.y - player.y);
+            if(d < minDist) { minDist = d; closest = opponent; }
+        }
+        for(let z of zombies) {
+            let d = Math.hypot(z.x - player.x, z.y - player.y);
+            if(d < minDist) { minDist = d; closest = z; }
+        }
+        return closest;
+    }
+    function shootAtClosest() {
+        if(!gameActive) {
+            // تنبيه خفيف: اللعبة غير نشطة
+            let btn = document.getElementById("fireTouchBtn");
+            btn.style.transform = "scale(0.95)";
+            setTimeout(() => btn.style.transform = "", 150);
+            alert("ابدأ المباراة أولاً (اضغط بدء مواجهة الزومبي أو تحدى صديق)");
+            return;
+        }
+        let target = getClosestEnemy();
+        let angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : 0;
+        shootProjectileWithAngle(angle);
+        // تأثير اهتزاز للزر عند الإطلاق
+        let btn = document.getElementById("fireTouchBtn");
+        btn.style.transform = "scale(0.92)";
+        setTimeout(() => btn.style.transform = "", 100);
+    }
+    function shootProjectileWithAngle(angle) {
+        if(!gameActive) return;
+        let damage = player.attack;
+        projectiles.push({
+            x: player.x, y: player.y, vx: Math.cos(angle)*8, vy: Math.sin(angle)*8,
+            damage: damage, radius: 6, owner: "player"
+        });
+        if(gameMode === "online" && peerConnection && peerConnection.open) {
+            peerConnection.send({ type:'shoot', angle:angle, x:player.x, y:player.y, damage:damage });
+            if(opponent && opponent.hp > 0){
+                let dx = opponent.x - player.x;
+                let dy = opponent.y - player.y;
+                let dist = Math.hypot(dx,dy);
+                let angleToOpp = Math.atan2(dy,dx);
+                let angleDiff = Math.abs(angle - angleToOpp);
+                if(dist < 200 && angleDiff < 0.4){
+                    let dmg = damage;
+                    opponent.hp -= dmg;
+                    if(opponent.hp < 0) opponent.hp = 0;
+                    peerConnection.send({ type:'damage', amount:dmg });
+                    if(opponent.hp <= 0) endGame();
+                }
+            }
+        }
+    }
+    function startSoloGame(){
+        if(gameActive) endGame();
+        let brawler = CHARACTERS.find(c=>c.id===currentUser.selectedCharId) || STARTER;
+        player = {
+            x: canvas.width/2, y: canvas.height/2, hp: brawler.health, maxHp: brawler.health,
+            attack: brawler.attack, radius: 18, kills: 0, username: currentUser.username
+        };
+        zombies = []; projectiles = [];
+        gameTimer = 90;
+        gameActive = true;
+        gameMode = "solo";
+        document.getElementById("gameHealth").innerText = player.hp;
+        document.getElementById("gameScore").innerText = "0";
+        document.getElementById("activeBrawlerName").innerText = brawler.name;
+        if(gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(()=>{
+            if(gameActive && gameTimer>0){
+                gameTimer--;
+                document.getElementById("gameTimer").innerText = gameTimer;
+                if(gameTimer<=0) endGame();
+            } else if(gameTimer<=0) endGame();
+        },1000);
+        for(let i=0;i<4;i++) spawnZombie();
+        requestAnimationFrame(gameLoop);
+    }
+    function spawnZombie(){
+        let side = Math.floor(Math.random()*4);
+        let x,y;
+        if(side===0){ x=Math.random()*canvas.width; y= -30; }
+        else if(side===1){ x=canvas.width+30; y=Math.random()*canvas.height; }
+        else if(side===2){ x=Math.random()*canvas.width; y=canvas.height+30; }
+        else{ x= -30; y=Math.random()*canvas.height; }
+        zombies.push({ x:x, y:y, hp:45+Math.floor(Math.random()*30), attack:12, radius:18, speed:1.1 });
+    }
+    function updateGame(){
+        if(!gameActive) return;
+        let moveX = moveVec.x, moveY = moveVec.y;
+        let speed = 5;
+        player.x += moveX * speed;
+        player.y += moveY * speed;
+        player.x = Math.min(Math.max(player.x, 20), canvas.width-20);
+        player.y = Math.min(Math.max(player.y, 20), canvas.height-20);
+        // تحديث المقذوفات
+        for(let i=0;i<projectiles.length;i++){
+            let p = projectiles[i];
+            p.x += p.vx; p.y += p.vy;
+            if(p.x<0 || p.x>canvas.width || p.y<0 || p.y>canvas.height){
+                projectiles.splice(i,1); i--; continue;
+            }
+            let hit=false;
+            for(let z=0;z<zombies.length;z++){
+                if(Math.hypot(p.x-zombies[z].x, p.y-zombies[z].y) < p.radius+zombies[z].radius){
+                    zombies[z].hp -= p.damage;
+                    if(zombies[z].hp<=0){
+                        zombies.splice(z,1);
+                        player.kills++;
+                        document.getElementById("gameScore").innerText = player.kills;
+                    }
+                    hit=true; break;
+                }
+            }
+            if(!hit && gameMode==="online" && p.owner==="opponent" && opponent && Math.hypot(p.x-player.x, p.y-player.y) < p.radius+player.radius){
+                player.hp -= p.damage;
+                if(player.hp<0) player.hp=0;
+                document.getElementById("gameHealth").innerText = player.hp;
+                hit=true;
+                if(player.hp<=0) endGame();
+            }
+            if(hit){ projectiles.splice(i,1); i--; }
+        }
+        // حركة الزومبي
+        for(let z of zombies){
+            let dx = player.x - z.x, dy = player.y - z.y;
+            let dist = Math.hypot(dx,dy);
+            if(dist>0.1){
+                let move = Math.min(1.8, z.speed);
+                z.x += (dx/dist)*move;
+                z.y += (dy/dist)*move;
+            }
+            if(dist < player.radius+z.radius){
+                player.hp -= z.attack;
+                if(player.hp<=0){ endGame(); return; }
+                document.getElementById("gameHealth").innerText = player.hp;
+                let angle = Math.atan2(dy,dx);
+                player.x -= Math.cos(angle)*25;
+                player.y -= Math.sin(angle)*25;
+            }
+        }
+        if(Math.random()<0.025 && zombies.length<10) spawnZombie();
+        document.getElementById("gameHealth").innerText = Math.max(0,player.hp);
+    }
+    function endGame(){
+        if(!gameActive) return;
+        gameActive = false;
+        if(gameInterval) clearInterval(gameInterval);
+        if(onlineUpdateInterval) clearInterval(onlineUpdateInterval);
+        let reward = 0;
+        if(gameMode === "solo"){
+            reward = player.kills * 3 + (gameTimer>0? 20 : 0);
+            if(player.hp<=0) reward = Math.max(5, reward-15);
+            addCups(reward);
+            alert(`انتهت اللعبة! قتلت ${player.kills} زومبي.\nربحت ${reward} كأس!`);
+        } else if(gameMode === "online" && opponent){
+            let winner = null;
+            if(player.hp<=0 && opponent.hp<=0) winner = "تعادل";
+            else if(player.hp<=0) winner = opponent.username;
+            else if(opponent.hp<=0) winner = currentUser.username;
+            else winner = (player.hp > opponent.hp) ? currentUser.username : opponent.username;
+            let cupChange = (winner === currentUser.username) ? 35 : (winner===opponent.username ? -20 : 0);
+            addCups(cupChange);
+            alert(`المباراة الأونلاين انتهت!\n${winner === currentUser.username ? "فزت!" : (winner==="تعادل"?"تعادل":"خسرت...")}\n${cupChange>0?`+${cupChange}`:cupChange} كأس`);
+            if(peerConnection) peerConnection.close();
+        }
+        player = null; zombies = []; projectiles = []; opponent = null; gameMode = null; peerConnection = null;
+        document.getElementById("onlineGameStatus").innerHTML = "";
+    }
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.strokeStyle = "#2d4a6e";
+        for(let i=0;i<canvas.width;i+=50){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+        for(let i=0;i<canvas.height;i+=50){ ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+        for(let z of zombies){
+            ctx.fillStyle = "#2d6a4f"; ctx.beginPath(); ctx.arc(z.x,z.y,z.radius,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle="white"; ctx.font="bold 12px monospace"; ctx.fillText(`💀${z.hp}`,z.x-12,z.y-10);
+        }
+        ctx.fillStyle = "#facc15"; ctx.shadowBlur=10; ctx.beginPath(); ctx.arc(player.x,player.y,player.radius,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="black"; ctx.font="bold 14px monospace"; ctx.fillText(currentUser.username,player.x-20,player.y-15);
+        ctx.fillStyle="red"; ctx.fillRect(player.x-20,player.y-25,40,6);
+        ctx.fillStyle="lime"; ctx.fillRect(player.x-20,player.y-25,40*(player.hp/player.maxHp),6);
+        if(opponent && gameMode==="online" && opponent.hp>0){
+            ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(opponent.x,opponent.y,18,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle="white"; ctx.fillText(opponent.username,opponent.x-20,opponent.y-20);
+            ctx.fillStyle="red"; ctx.fillRect(opponent.x-20,opponent.y-30,40,6);
+            ctx.fillStyle="lime"; ctx.fillRect(opponent.x-20,opponent.y-30,40*(opponent.hp/opponent.maxHp),6);
+        }
+        for(let p of projectiles){ ctx.fillStyle="yellow"; ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fill(); }
+        ctx.shadowBlur=0;
+    }
+    function gameLoop(){
+        if(gameActive){ updateGame(); draw(); requestAnimationFrame(gameLoop); }
+        else draw();
+    }
+
+    // دوال الأونلاين
+    function initPeer(){
+        const peer = new Peer();
+        peer.on('open', id => {
+            currentUser.myPeerId = id;
+            document.getElementById("myPeerId").innerText = id;
+            document.getElementById("peerIdDisplay").innerText = id;
+            currentUser.peer = peer;
+        });
+        peer.on('connection', conn => setupConnection(conn));
+    }
+    function setupConnection(conn){
+        conn.on('open', () => conn.send({ type:'handshake', username:currentUser.username }));
+        conn.on('data', data => handlePeerData(conn, data));
+        currentUser.connections.set(conn.peer, conn);
+        if(!currentUser.friends.some(f=>f.peerId===conn.peer)){
+            currentUser.friends.push({ peerId:conn.peer, username:"?", connection:conn });
+            renderFriends(); saveToLocal();
+        }
+    }
+    function handlePeerData(conn, data){
+        if(data.type === 'handshake'){
+            let f = currentUser.friends.find(f=>f.peerId===conn.peer);
+            if(f) f.username = data.username;
+            renderFriends();
+        } else if(data.type === 'chat'){
+            displayChat(`${data.from}: ${data.text}`);
+        } else if(data.type === 'online_challenge'){
+            if(confirm(`${data.fromUsername} يتحداك في المعركة! توافق؟`)){
+                startOnlineMatch(conn, true);
+                conn.send({ type:'accept_challenge', accept:true });
+            } else conn.send({ type:'accept_challenge', accept:false });
+        } else if(data.type === 'accept_challenge'){
+            if(data.accept) startOnlineMatch(conn, false);
+            else alert("الخصم رفض التحدي");
+        } else if(data.type === 'game_update'){
+            if(opponent){ opponent.x = data.x; opponent.y = data.y; }
+        } else if(data.type === 'shoot'){
+            let angle = data.angle;
+            projectiles.push({ x:data.x, y:data.y, vx:Math.cos(angle)*8, vy:Math.sin(angle)*8, damage:data.damage, radius:6, owner:"opponent" });
+        } else if(data.type === 'damage'){
+            if(opponent){ opponent.hp -= data.amount; if(opponent.hp<0) opponent.hp=0; if(opponent.hp<=0) endGame(); }
+        }
+    }
+    function startOnlineMatch(conn, isInitiator){
+        if(gameActive) endGame();
+        let brawler = CHARACTERS.find(c=>c.id===currentUser.selectedCharId) || STARTER;
+        player = {
+            x: isInitiator ? 200 : canvas.width-200, y: canvas.height/2,
+            hp: brawler.health, maxHp: brawler.health, attack: brawler.attack, radius:18, kills:0, username:currentUser.username
+        };
+        opponent = {
+            x: isInitiator ? canvas.width-200 : 200, y: canvas.height/2,
+            hp: brawler.health, maxHp: brawler.health, username: "خصم"
+        };
+        zombies = []; projectiles = [];
+        gameTimer = 90;
+        gameActive = true;
+        gameMode = "online";
+        peerConnection = conn;
+        document.getElementById("gameHealth").innerText = player.hp;
+        document.getElementById("gameScore").innerText = "0";
+        document.getElementById("activeBrawlerName").innerText = brawler.name;
+        if(gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(()=>{
+            if(gameActive && gameTimer>0){
+                gameTimer--;
+                document.getElementById("gameTimer").innerText = gameTimer;
+                if(gameTimer<=0) endGame();
+            } else if(gameTimer<=0) endGame();
+        },1000);
+        onlineUpdateInterval = setInterval(()=>{
+            if(gameActive && peerConnection && peerConnection.open){
+                peerConnection.send({ type:'game_update', x:player.x, y:player.y });
+            } else if(!gameActive) clearInterval(onlineUpdateInterval);
+        }, 50);
+        requestAnimationFrame(gameLoop);
+    }
+    function challengeFriend(peerId){
+        let conn = currentUser.connections.get(peerId);
+        if(!conn){ conn = currentUser.peer.connect(peerId); setupConnection(conn); }
+        conn.send({ type:'online_challenge', fromUsername:currentUser.username });
+        document.getElementById("onlineGameStatus").innerHTML = "تم إرسال التحدي...";
+    }
+    function renderFriends(){
+        let container = document.getElementById("friendsListContainer");
+        let selectOnline = document.getElementById("onlineFriendSelect");
+        let chatSelect = document.getElementById("chatFriendSelect");
+        if(!container) return;
+        container.innerHTML = "";
+        let options = '<option value="">-- اختر صديق --</option>';
+        currentUser.friends.forEach(f=>{
+            let div = document.createElement("div"); div.className="friend-item";
+            div.innerHTML = `<span><i class="fas fa-user"></i> ${f.username} (${f.peerId.slice(0,6)}..)</span>`;
+            container.appendChild(div);
+            options += `<option value="${f.peerId}">${f.username}</option>`;
+        });
+        selectOnline.innerHTML = options;
+        chatSelect.innerHTML = options;
+    }
+    function sendChatToFriend(peerId, text){
+        let conn = currentUser.connections.get(peerId);
+        if(!conn){ alert("الصديق غير متصل"); return; }
+        conn.send({ type:'chat', text:text, from:currentUser.username });
+        displayChat(`أنا: ${text}`);
+    }
+    function displayChat(msg){
+        let box = document.getElementById("chatMessagesBox");
+        let p = document.createElement("div"); p.innerText = msg; box.appendChild(p); box.scrollTop = box.scrollHeight;
+    }
+    function renderShop(){
+        let container = document.getElementById("shopGrid");
+        container.innerHTML = "";
+        CHARACTERS.forEach(c=>{
+            let owned = currentUser.ownedChars.includes(c.id);
+            let div = document.createElement("div"); div.className="shop-card";
+            div.innerHTML = `<div class="char-icon">${c.icon}</div><h4>${c.name}</h4><p>⚔️${c.attack} ❤️${c.health}</p><p>💰${c.price}🏆</p>${owned?"<span style='color:#4ade80;'>مملوكة</span>":`<button class='buyBtn' data-id='${c.id}'>شراء</button>`}`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll(".buyBtn").forEach(btn=>{
+            btn.onclick = (e)=>{
+                let id = parseInt(btn.dataset.id);
+                let char = CHARACTERS.find(c=>c.id===id);
+                if(currentUser.cups >= char.price && !currentUser.ownedChars.includes(id)){
+                    currentUser.cups -= char.price;
+                    currentUser.ownedChars.push(id);
+                    updateUI(); saveToLocal(); renderShop(); renderMyChars();
+                } else alert("ليس لديك كؤوس كافية أو تملكها بالفعل");
+            };
+        });
+    }
+    function renderMyChars(){
+        let container = document.getElementById("myCharsGrid");
+        container.innerHTML = "";
+        currentUser.ownedChars.forEach(cid=>{
+            let c = CHARACTERS.find(c=>c.id===cid);
+            let selected = (currentUser.selectedCharId===cid);
+            let div = document.createElement("div"); div.className = `char-card ${selected?"selected":""}`;
+            div.innerHTML = `<div class="char-icon">${c.icon}</div><h4>${c.name}</h4><p>⚔️${c.attack} ❤️${c.health}</p>${!selected?`<button class='selectChar' data-id='${cid}'>تجهيز</button>`:"✨ مجهزة"}`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll(".selectChar").forEach(btn=>{
+            btn.onclick = (e)=>{
+                let id = parseInt(btn.dataset.id);
+                currentUser.selectedCharId = id;
+                saveToLocal();
+                renderMyChars();
+                updateEquippedDisplay();
+                if(!gameActive){
+                    let b = CHARACTERS.find(c=>c.id===id);
+                    document.getElementById("activeBrawlerName").innerText = b.name;
+                }
+            };
+        });
+    }
+
+    // التحكم باللمس (عصا تحكم)
+    const joystickZone = document.getElementById("joystickZone");
+    const joystickThumb = document.getElementById("joystickThumb");
+    function handleJoystickStart(e){
+        e.preventDefault();
+        let rect = joystickZone.getBoundingClientRect();
+        let touch = e.touches[0];
+        joystickOrigin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+        joystickActive = true;
+        handleJoystickMove(e);
+    }
+    function handleJoystickMove(e){
+        if(!joystickActive) return;
+        e.preventDefault();
+        let touch = e.touches[0];
+        let dx = touch.clientX - joystickOrigin.x;
+        let dy = touch.clientY - joystickOrigin.y;
+        let maxDist = 40;
+        let dist = Math.min(maxDist, Math.hypot(dx,dy));
+        let angle = Math.atan2(dy,dx);
+        let thumbX = (joystickZone.clientWidth/2) + Math.cos(angle)*dist;
+        let thumbY = (joystickZone.clientHeight/2) + Math.sin(angle)*dist;
+        joystickThumb.style.transform = `translate(${thumbX-27.5}px, ${thumbY-27.5}px)`;
+        moveVec.x = (dist/maxDist) * Math.cos(angle);
+        moveVec.y = (dist/maxDist) * Math.sin(angle);
+    }
+    function handleJoystickEnd(e){
+        joystickActive = false;
+        joystickThumb.style.transform = `translate(37.5px, 37.5px)`;
+        moveVec = { x:0, y:0 };
+    }
+    joystickZone.addEventListener("touchstart", handleJoystickStart, {passive:false});
+    joystickZone.addEventListener("touchmove", handleJoystickMove, {passive:false});
+    joystickZone.addEventListener("touchend", handleJoystickEnd);
+    
+    // زر الإطلاق - استجابة لكل من click و touchstart
+    const fireBtn = document.getElementById("fireTouchBtn");
+    fireBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        shootAtClosest();
+    });
+    fireBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        shootAtClosest();
+    });
+    
+    canvas.addEventListener("touchstart", (e)=> e.preventDefault());
+
+    // إعداد المستمعين للأزرار
+    window.addEventListener("load", ()=>{
+        loadFromLocal();
+        initPeer();
+        updateLeaderboard();
+        renderShop(); renderMyChars(); renderFriends();
+        let initialBrawler = CHARACTERS.find(c=>c.id===currentUser.selectedCharId) || STARTER;
+        document.getElementById("activeBrawlerName").innerText = initialBrawler.name;
+        document.getElementById("startSoloBtn").onclick = ()=> startSoloGame();
+        document.getElementById("challengeOnlineBtn").onclick = ()=>{
+            let fid = document.getElementById("onlineFriendSelect").value;
+            if(fid) challengeFriend(fid);
+            else alert("اختر صديقاً أولاً");
+        };
+        document.getElementById("addFriendBtn").onclick = ()=>{
+            let pid = document.getElementById("friendPeerInput").value.trim();
+            if(pid && pid !== currentUser.myPeerId){
+                let conn = currentUser.peer.connect(pid);
+                setupConnection(conn);
+                document.getElementById("friendPeerInput").value = "";
+            } else alert("معرف غير صالح");
+        };
+        document.getElementById("sendChatBtn").onclick = ()=>{
+            let fid = document.getElementById("chatFriendSelect").value;
+            let msg = document.getElementById("chatMessageInput").value;
+            if(fid && msg){ sendChatToFriend(fid, msg); document.getElementById("chatMessageInput").value=""; }
+        };
+        document.getElementById("saveUsernameBtn").onclick = ()=>{
+            let newName = document.getElementById("usernameInput").value.trim();
+            if(newName) currentUser.username = newName;
+            saveToLocal(); updateLeaderboard();
+        };
+        document.getElementById("refreshLeaderboardBtn").onclick = ()=>updateLeaderboard();
+        document.getElementById("copyPeerBtn").onclick = ()=>{
+            if(currentUser.myPeerId) navigator.clipboard.writeText(currentUser.myPeerId);
+            alert("تم نسخ المعرف!");
+        };
+        document.querySelectorAll(".tab-btn").forEach(btn=>{
+            btn.onclick = ()=>{
+                document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active-panel"));
+                document.getElementById(btn.dataset.tab+"Panel").classList.add("active-panel");
+                document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+                btn.classList.add("active");
+                if(btn.dataset.tab==="shop") renderShop();
+                if(btn.dataset.tab==="characters") renderMyChars();
+                if(btn.dataset.tab==="leaderboard") updateLeaderboard();
+                if(btn.dataset.tab==="friends") renderFriends();
+            };
+        });
+    });
+</script>
+</body>
+</html>
